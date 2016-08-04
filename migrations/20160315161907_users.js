@@ -16,12 +16,19 @@ exports.up = function(knex, Promise) {
       table.string('google');
       table.string('vk');
       table.timestamps();
+    }).createTable('images', function(table) {
+      table.increments();
+      table.string("url").notNullable();
+      table.integer("liked_count");
+      table.integer("user_id").references("id").inTable('users');
     })
   ]);
 };
 
 exports.down = function(knex, Promise) {
   return Promise.all([
-    knex.schema.dropTable('users')
+    knex.schema
+        .dropTable("images")
+        .dropTable('users')
   ])
 };

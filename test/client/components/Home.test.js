@@ -13,12 +13,8 @@ const mockStore = configureStore(middlewares);
 describe('Home component', () => {
   const component = shallow(<Home store={mockStore({ messages: {} })}/>).shallow();
 
-  it('contains View details link', () => {
-    expect(component.containsMatchingElement(<a>View details</a>)).to.equal(true);
-  });
-
-  it('contains 3 headings', () => {
-    expect(component.find('h3')).to.have.length(3);
+  it('contains a welcome header', () => {
+    expect(component.find('h1')).to.have.length(1);
   });
 
   it('contains flash messages component', () => {

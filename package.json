@@ -7,6 +7,7 @@
     "build:css": "node-sass public/css/main.scss > public/css/main.css",
     "build:js": "browserify app/main.js -t [ babelify --presets [es2015 react] ] -o public/js/bundle.js",
     "deploy": "npm test && git push heroku master",
+    "knex": "./node_modules/.bin/knex",
     "postinstall": "npm run build",
     "start": "node server.js",
     "test": "npm run test:client && npm run test:server",

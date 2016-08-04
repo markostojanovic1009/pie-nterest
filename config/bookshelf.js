@@ -1,5 +1,7 @@
 var config = require('../knexfile');
-var knex = require('knex')(config);
+var environment = process.env.NODE_ENV || 'development';
+console.log(environment);
+var knex = require('knex')(config[environment]);
 var bookshelf = require('bookshelf')(knex);
 
 bookshelf.plugin('virtuals');

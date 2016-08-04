@@ -28,7 +28,8 @@ describe('auth actions', () => {
 
     const expectedActions = [
       { type: 'CLEAR_MESSAGES' },
-      { type: 'LOGIN_SUCCESS', token: token, user: user }];
+      { type: 'LOGIN_SUCCESS', token: token, user: user }
+      ];
 
     const store = mockStore({});
 

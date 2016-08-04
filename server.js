@@ -27,6 +27,7 @@ var User = require('./models/User');
 // Controllers
 var userController = require('./controllers/user');
 var contactController = require('./controllers/contact');
+var imageController = require('./controllers/image');
 
 // React and Server-Side Rendering
 var routes = require('./app/routes');
@@ -69,6 +70,7 @@ app.use(function(req, res, next) {
 });
 
 app.post('/contact', contactController.contactPost);
+
 app.put('/account', userController.ensureAuthenticated, userController.accountPut);
 app.delete('/account', userController.ensureAuthenticated, userController.accountDelete);
 app.post('/signup', userController.signupPost);
@@ -78,6 +80,8 @@ app.post('/reset/:token', userController.resetPost);
 app.get('/unlink/:provider', userController.ensureAuthenticated, userController.unlink);
 app.post('/auth/twitter', userController.authTwitter);
 app.get('/auth/twitter/callback', userController.authTwitterCallback);
+
+app.post('/:userId/images', imageController.ensureAuthenticated, imageController.postImage);
 
 // React server rendering
 app.use(function(req, res) {
