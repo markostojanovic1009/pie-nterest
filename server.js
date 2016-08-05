@@ -81,6 +81,8 @@ app.get('/unlink/:provider', userController.ensureAuthenticated, userController.
 app.post('/auth/twitter', userController.authTwitter);
 app.get('/auth/twitter/callback', userController.authTwitterCallback);
 
+app.get('/images', imageController.getAllImages);
+app.get('/:userId/images', imageController.ensureAuthenticated, imageController.getUserImages);
 app.post('/:userId/images', imageController.ensureAuthenticated, imageController.postImage);
 
 // React server rendering

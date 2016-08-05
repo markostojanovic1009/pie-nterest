@@ -1,6 +1,7 @@
 var crypto = require('crypto');
 var bcrypt = require('bcrypt-nodejs');
 var bookshelf = require('../config/bookshelf');
+import Image from "./Image";
 
 var User = bookshelf.Model.extend({
   tableName: 'users',
@@ -31,6 +32,10 @@ var User = bookshelf.Model.extend({
     bcrypt.compare(password, model.get('password'), function(err, isMatch) {
       done(err, isMatch);
     });
+  },
+
+  images() {
+    return this.hasMany(Image);
   },
 
   hidden: ['password', 'passwordResetToken', 'passwordResetExpires'],

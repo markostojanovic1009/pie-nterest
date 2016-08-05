@@ -1,12 +1,11 @@
 var config = require('../knexfile');
 var environment = process.env.NODE_ENV || 'development';
-console.log(environment);
 var knex = require('knex')(config[environment]);
 var bookshelf = require('bookshelf')(knex);
 
 bookshelf.plugin('virtuals');
 bookshelf.plugin('visibility');
 
-knex.migrate.latest();
+//knex.migrate.latest();
 
 module.exports = bookshelf;

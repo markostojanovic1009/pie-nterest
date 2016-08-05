@@ -16,11 +16,11 @@ exports.up = function(knex, Promise) {
             table.string('google');
             table.string('vk');
             table.timestamps();
-        }).createTable('images', function(table) {
+        }).createTable('images', function (table) {
             table.increments();
             table.string("url").notNullable();
             table.string("title");
-            table.integer("liked_count");
+            table.integer("liked_count").defaultTo(0);
             table.integer("user_id").references("id").inTable('users');
         })
     ]);
@@ -29,7 +29,7 @@ exports.up = function(knex, Promise) {
 exports.down = function(knex, Promise) {
     return Promise.all([
         knex.schema
-            .dropTable("images")
-            .dropTable('users')
+            .dropTableIfExists("images")
+            .dropTableIfExists('users')
     ])
 };
