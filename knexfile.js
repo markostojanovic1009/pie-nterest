@@ -3,9 +3,9 @@ var dotenv = require('dotenv');
 dotenv.load();
 
 module.exports = {
-
   development: {
     client: 'pg',
+    debug: true,
     connection: {
       host: process.env.DB_HOST,
       user: process.env.DB_USER,

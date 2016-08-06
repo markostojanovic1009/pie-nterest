@@ -84,6 +84,8 @@ app.get('/auth/twitter/callback', userController.authTwitterCallback);
 app.get('/images', imageController.getAllImages);
 app.get('/:userId/images', imageController.ensureAuthenticated, imageController.getUserImages);
 app.post('/:userId/images', imageController.ensureAuthenticated, imageController.postImage);
+app.post('/:userId/images/liked', imageController.ensureAuthenticated, imageController.likeImage);
+app.get('/:userId/images/liked', imageController.ensureAuthenticated, imageController.getLikedImages);
 
 // React server rendering
 app.use(function(req, res) {

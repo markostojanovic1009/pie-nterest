@@ -2,6 +2,7 @@ var crypto = require('crypto');
 var bcrypt = require('bcrypt-nodejs');
 var bookshelf = require('../config/bookshelf');
 import Image from "./Image";
+import LikedImage from "./LikedImage";
 
 var User = bookshelf.Model.extend({
   tableName: 'users',
@@ -9,6 +10,33 @@ var User = bookshelf.Model.extend({
 
   initialize: function() {
     this.on('saving', this.hashPassword, this);
+  },
+
+  images() {
+    return this.hasMany(Image);
+  },
+
+  liked() {
+    return this.belongsToMany(Image).through(LikedImage);
+  },
+
+  getLikedImages() {
+    return new Promise((resolve, reject) => {
+      this.liked().fetch().then((likedImages) => {
+        resolve(likedImages);
+      }).catch(error => reject(error));
+    });
+  },
+
+  likeImage(imageId) {
+    var self = this;
+    return new Promise((resolve, reject) => {
+      Image.forge({id: imageId}).fetch().then((image) => {
+        self.liked().attach(image);
+      }).then(() => {
+        resolve();
+      });
+    });
   },
 
   hashPassword: function(model, attrs, options) {
@@ -32,10 +60,6 @@ var User = bookshelf.Model.extend({
     bcrypt.compare(password, model.get('password'), function(err, isMatch) {
       done(err, isMatch);
     });
-  },
-
-  images() {
-    return this.hasMany(Image);
   },
 
   hidden: ['password', 'passwordResetToken', 'passwordResetExpires'],

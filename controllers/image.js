@@ -55,3 +55,29 @@ export function getUserImages(req, res) {
            res.status(404).send({msg: "No images found."});
         });
 }
+
+export function getLikedImages(req, res) {
+    User.forge({id: req.user.id})
+        .getLikedImages()
+        .then((likedImages) => {
+            res.status(200).send(likedImages);
+        })
+        .catch((error) => {
+            res.status(400).send(error);
+        });
+}
+
+export function likeImage(req, res) {
+    var imageId = req.body.image_id;
+    new User({id: req.user.id})
+        .fetch()
+        .then((user) => {
+            user.likeImage(imageId);
+        })
+        .then(() => {
+            res.sendStatus(204);
+        })
+        .catch((error) => {
+           res.status(400).send({msg: "No image with that id found."});
+        });
+}

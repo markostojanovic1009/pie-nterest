@@ -1,19 +1,16 @@
 var bookshelf = require('../config/bookshelf');
 var User = require('./User');
-import LikedImage from "./LikedImage";
-
+import Image  from './Image';
 
 export default bookshelf.Model.extend({
-    tableName: "images",
+    tableName: "liked_images",
     hasTimestamps: false,
 
     user() {
         return this.belongsTo(User);
     },
 
-    likedBy() {
-        return this.belongsToMany(User, "image_id").through(LikedImage);
+    image() {
+        return this.belongsTo(Image, "image_id");
     }
-
-
 });

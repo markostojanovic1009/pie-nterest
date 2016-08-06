@@ -4,8 +4,10 @@ exports.seed = function(knex, Promise) {
     var firstUserId;
   return Promise.join(
       // Deletes ALL existing entries
-      knex('images').del().then( () => {
-        return knex('users').del()
+      knex('liked_images').del().then( () => {
+        return knex('images').del()
+      }).then( () => {
+          return knex('users').del()
       }).then( () => {
         return knex('users').insert({
           email: 'email@email.com',
@@ -16,7 +18,9 @@ exports.seed = function(knex, Promise) {
           firstUserId = userId;
         return knex('images').insert({user_id: parseInt(userId), title: 'test_image', url: 'testurl.com'});
       }).then(() => {
-          return knex('images').insert({user_id: parseInt(firstUserId), title: 'aditional_test_image', url: 'newtesturl.com'});
+          return knex('images').insert({user_id: parseInt(firstUserId), title: 'aditional_test_image', url: 'newtesturl.com'}).returning("id");
+      }).then((secondImageId) => {
+          return knex('liked_images').insert({user_id: parseInt(firstUserId), image_id: parseInt(secondImageId)});
       })
   );
 };
