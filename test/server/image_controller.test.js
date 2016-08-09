@@ -37,7 +37,7 @@ describe('Image Controller', () => {
         });
     });
 
-    describe('POST /:userId/images', function () {
+    describe('POST /api/:userId/images', function () {
 
         let user = {
             email: 'email@email.com',
@@ -56,7 +56,7 @@ describe('Image Controller', () => {
                     user = res.body.user;
                     token = res.body.token;
                     request(server)
-                        .post('/' + user.id + '/images')
+                        .post('/api/' + user.id + '/images')
                         .set('Authorization', 'Bearer ' + token)
                         .send(testImage)
                         .expect(204, done);
@@ -66,7 +66,7 @@ describe('Image Controller', () => {
         it("should send 401 if user isn't properly authenticated", (done) => {
             var wrongToken = 'wrongToken';
             request(server)
-                .post('/' + user.id + '/images')
+                .post('/api/' + user.id + '/images')
                 .set('Authorization', 'Bearer ' + wrongToken)
                 .send(testImage)
                 .expect(401, done);
@@ -74,7 +74,7 @@ describe('Image Controller', () => {
 
         it('should reject if image does not have title and url', (done) => {
             request(server)
-                .post('/' + user.id + '/images')
+                .post('/api/' + user.id + '/images')
                 .set('Authorization', 'Bearer ' + token)
                 .send({title: "", url: ""})
                 .expect(400)
@@ -86,10 +86,10 @@ describe('Image Controller', () => {
         });
     });
 
-    describe('GET /images', () => {
+    describe('GET /api/images', () => {
 
         it('should get all images from the database', (done)=> {
-            request(server).get('/images').expect(200).then((res) => {
+            request(server).get('/api/images').expect(200).then((res) => {
                 expect(Promise.resolve(knex('images').count('id'))).to.eventually.have.length(res.body.length);
                 done();
             }).catch((err) => {
@@ -99,7 +99,7 @@ describe('Image Controller', () => {
 
     });
 
-    describe('GET /:userId/images', function() {
+    describe('GET /api/:userId/images', function() {
 
         let user = {
             email: 'email@email.com',
@@ -113,7 +113,7 @@ describe('Image Controller', () => {
                     user = res.body.user;
                     token = res.body.token;
                     request(server)
-                        .get('/' + user.id + '/images')
+                        .get('/api/' + user.id + '/images')
                         .set('Authorization', 'Bearer ' + token)
                         .expect(200)
                         .then((res) => {
@@ -127,7 +127,7 @@ describe('Image Controller', () => {
         });
     });
 
-    describe('POST /:userId/images/liked', () => {
+    describe('POST /api/:userId/images/liked', () => {
 
         let user = {
             email: 'email@email.com',
@@ -141,11 +141,11 @@ describe('Image Controller', () => {
                     user = res.body.user;
                     token = res.body.token;
                     return request(server)
-                        .get('/' + user.id + '/images')
+                        .get('/api/' + user.id + '/images')
                         .set('Authorization', 'Bearer ' + token)
                 }).then((res) => {
                 request(server)
-                    .post('/' + user.id + '/images/liked')
+                    .post('/api/' + user.id + '/images/liked')
                     .set('Authorization', 'Bearer ' + token)
                     .send({image_id: res.body[0].id})
                     .expect(204)

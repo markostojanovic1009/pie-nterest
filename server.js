@@ -81,17 +81,21 @@ app.get('/unlink/:provider', userController.ensureAuthenticated, userController.
 app.post('/auth/twitter', userController.authTwitter);
 app.get('/auth/twitter/callback', userController.authTwitterCallback);
 
-app.get('/images', imageController.getAllImages);
-app.get('/:userId/images', imageController.ensureAuthenticated, imageController.getUserImages);
-app.post('/:userId/images', imageController.ensureAuthenticated, imageController.postImage);
-app.post('/:userId/images/liked', imageController.ensureAuthenticated, imageController.likeImage);
-app.get('/:userId/images/liked', imageController.ensureAuthenticated, imageController.getLikedImages);
+/**
+ * I use /api/ to prevent the user from accessing it directly
+ */
+app.get('/api/images', imageController.getAllImages);
+app.get('/api/:userId/images', imageController.ensureAuthenticated, imageController.getUserImages);
+app.post('/api/:userId/images', imageController.ensureAuthenticated, imageController.postImage);
+app.post('/api/:userId/images/liked', imageController.ensureAuthenticated, imageController.likeImage);
+app.get('/api/:userId/images/liked', imageController.ensureAuthenticated, imageController.getLikedImages);
 
 // React server rendering
 app.use(function(req, res) {
   var initialState = {
     auth: { token: req.cookies.token, user: req.user },
-    messages: {}
+    messages: {},
+    images: { isFetching: false, items: []}
   };
 
   var store = configureStore(initialState);
