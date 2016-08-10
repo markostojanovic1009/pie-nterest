@@ -29,12 +29,16 @@ var User = bookshelf.Model.extend({
   },
 
   likeImage(imageId) {
-    var self = this;
+    const self = this;
     return new Promise((resolve, reject) => {
       Image.forge({id: imageId}).fetch().then((image) => {
         self.liked().attach(image);
       }).then(() => {
         resolve();
+      }).then(() => {
+        reject({
+          msg: "An error occurred, please try again later."
+        });
       });
     });
   },

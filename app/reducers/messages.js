@@ -10,6 +10,8 @@ export default function messages(state = {}, action) {
     case 'OAUTH_FAILURE':
     case 'UNLINK_FAILURE':
     case 'LINK_FAILURE':
+    case 'ADD_IMAGE_FAILURE':
+    case 'RECEIVE_IMAGES_FAILURE':
       return {
         error: action.messages
       };

@@ -1,6 +1,7 @@
 @import "settings";
 @import "vendor/foundation/foundation";
 @import "all_images.scss";
+@import "my_images.scss";
 
 @include foundation-global-styles;
 @include foundation-grid;
@@ -54,7 +55,7 @@ html {
 }
 
 body {
-  margin: 0 0 50px;
+  margin: 0 0 90px;
 }
 
 footer {

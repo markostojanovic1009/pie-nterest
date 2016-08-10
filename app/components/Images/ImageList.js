@@ -33,7 +33,6 @@ class ImageList extends React.Component {
                 </div>
             );
         });
-        console.log(mappedImages);
         return (
             <div>
                 {isLoading}

@@ -23,12 +23,13 @@ export function postImage(req, res) {
     }
 
     const {title, url} = req.body;
-    new Image({
+    const newImage = new Image({
         title,
         url,
         user_id: req.user.id
-    }).save().then(() => {
-        res.sendStatus(204);
+    });
+    newImage.save().then(() => {
+        res.status(200).send(newImage);
     }).catch((error) => {
         res.status(400).send({msg: "Image url or title are not correct. Please try again."});
     });
@@ -37,8 +38,8 @@ export function postImage(req, res) {
 export function getAllImages(req, res) {
     new Image()
         .fetchAll({require: true})
-        .then(function(bookModel) {
-            res.status(200).send(bookModel);
+        .then(function(books) {
+            res.status(200).send(books);
         })
         .catch((error) => {
            res.status(404).send({msg: "No images found."});

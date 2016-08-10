@@ -59,7 +59,7 @@ describe('Image Controller', () => {
                         .post('/api/' + user.id + '/images')
                         .set('Authorization', 'Bearer ' + token)
                         .send(testImage)
-                        .expect(204, done);
+                        .expect(200, done);
                 });
         });
 

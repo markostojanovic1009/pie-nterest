@@ -9,6 +9,8 @@ export default function images(state = initialState, action) {
             return Object.assign({}, state, { isFetching: true });
         case "RECEIVE_IMAGES_SUCCESS":
             return Object.assign({}, state, { isFetching: false, items: action.images.slice()});
+        case "ADD_IMAGE_SUCCESS":
+            return Object.assign({}, state, { items: [...state.items, action.image]});
         default:
             return state;
     }

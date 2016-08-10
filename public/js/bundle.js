@@ -442,9 +442,17 @@ function submitContactForm(name, email, message) {
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.__RewireAPI__ = exports.__ResetDependency__ = exports.__set__ = exports.__Rewire__ = exports.__GetDependency__ = exports.__get__ = undefined;
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
 exports.getAllImages = getAllImages;
 exports.getUserImages = getUserImages;
 exports.getLikedImages = getLikedImages;
+exports.addImage = addImage;
+
+var _reactRouter = require('react-router');
+
 function getAllImages() {
     return function (dispatch) {
         dispatch({
@@ -492,7 +500,7 @@ function getUserImages(user, token) {
                 } else {
                     dispatch({
                         type: 'RECEIVE_IMAGES_FAILURE',
-                        message: json.msg
+                        messages: json.msg
                     });
                 }
             });
@@ -521,7 +529,7 @@ function getLikedImages(user, token) {
                 } else {
                     dispatch({
                         type: 'RECEIVE_IMAGES_FAILURE',
-                        message: json.msg
+                        messages: json.msg
                     });
                 }
             });
@@ -529,7 +537,163 @@ function getLikedImages(user, token) {
     };
 }
 
-},{}],4:[function(require,module,exports){
+function addImage(user, token, title, url) {
+    return function (dispatch) {
+        dispatch({
+            type: "CLEAR_MESSAGES"
+        });
+        return fetch('/api/' + user.id + '/images', {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ title: title, url: url })
+        }).then(function (response) {
+            return response.json().then(function (json) {
+                if (response.ok) {
+                    dispatch({
+                        type: "ADD_IMAGE_SUCCESS",
+                        image: json
+                    });
+                    _get__('browserHistory').push('/' + user.id + '/images');
+                } else {
+                    dispatch({
+                        type: 'ADD_IMAGE_FAILURE',
+                        messages: json
+                    });
+                }
+            });
+        });
+    };
+}
+
+var _RewiredData__ = Object.create(null);
+
+var INTENTIONAL_UNDEFINED = '__INTENTIONAL_UNDEFINED__';
+var _RewireAPI__ = {};
+
+(function () {
+    function addPropertyToAPIObject(name, value) {
+        Object.defineProperty(_RewireAPI__, name, {
+            value: value,
+            enumerable: false,
+            configurable: true
+        });
+    }
+
+    addPropertyToAPIObject('__get__', _get__);
+    addPropertyToAPIObject('__GetDependency__', _get__);
+    addPropertyToAPIObject('__Rewire__', _set__);
+    addPropertyToAPIObject('__set__', _set__);
+    addPropertyToAPIObject('__reset__', _reset__);
+    addPropertyToAPIObject('__ResetDependency__', _reset__);
+    addPropertyToAPIObject('__with__', _with__);
+})();
+
+function _get__(variableName) {
+    if (_RewiredData__ === undefined || _RewiredData__[variableName] === undefined) {
+        return _get_original__(variableName);
+    } else {
+        var value = _RewiredData__[variableName];
+
+        if (value === INTENTIONAL_UNDEFINED) {
+            return undefined;
+        } else {
+            return value;
+        }
+    }
+}
+
+function _get_original__(variableName) {
+    switch (variableName) {
+        case 'browserHistory':
+            return _reactRouter.browserHistory;
+    }
+
+    return undefined;
+}
+
+function _assign__(variableName, value) {
+    if (_RewiredData__ === undefined || _RewiredData__[variableName] === undefined) {
+        return _set_original__(variableName, value);
+    } else {
+        return _RewiredData__[variableName] = value;
+    }
+}
+
+function _set_original__(variableName, _value) {
+    switch (variableName) {}
+
+    return undefined;
+}
+
+function _update_operation__(operation, variableName, prefix) {
+    var oldValue = _get__(variableName);
+
+    var newValue = operation === '++' ? oldValue + 1 : oldValue - 1;
+
+    _assign__(variableName, newValue);
+
+    return prefix ? newValue : oldValue;
+}
+
+function _set__(variableName, value) {
+    if ((typeof variableName === 'undefined' ? 'undefined' : _typeof(variableName)) === 'object') {
+        Object.keys(variableName).forEach(function (name) {
+            _RewiredData__[name] = variableName[name];
+        });
+    } else {
+        if (value === undefined) {
+            _RewiredData__[variableName] = INTENTIONAL_UNDEFINED;
+        } else {
+            _RewiredData__[variableName] = value;
+        }
+
+        return value;
+    }
+}
+
+function _reset__(variableName) {
+    delete _RewiredData__[variableName];
+}
+
+function _with__(object) {
+    var rewiredVariableNames = Object.keys(object);
+    var previousValues = {};
+
+    function reset() {
+        rewiredVariableNames.forEach(function (variableName) {
+            _RewiredData__[variableName] = previousValues[variableName];
+        });
+    }
+
+    return function (callback) {
+        rewiredVariableNames.forEach(function (variableName) {
+            previousValues[variableName] = _RewiredData__[variableName];
+            _RewiredData__[variableName] = object[variableName];
+        });
+        var result = callback();
+
+        if (!!result && typeof result.then == 'function') {
+            result.then(reset).catch(reset);
+        } else {
+            reset();
+        }
+
+        return result;
+    };
+}
+
+exports.__get__ = _get__;
+exports.__GetDependency__ = _get__;
+exports.__Rewire__ = _set__;
+exports.__set__ = _set__;
+exports.__ResetDependency__ = _reset__;
+exports.__RewireAPI__ = _RewireAPI__;
+exports.default = _RewireAPI__;
+
+},{"react-router":128}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4098,6 +4262,11 @@ var Image = function (_get__$Component) {
     }
 
     _createClass(Image, [{
+        key: "handleImageError",
+        value: function handleImageError(event) {
+            event.target.src = "/images/no_image_found.jpg";
+        }
+    }, {
         key: "render",
         value: function render() {
             var image = this.props.image;
@@ -4113,7 +4282,7 @@ var Image = function (_get__$Component) {
                         { className: "image-title" },
                         image.title
                     ),
-                    _react2.default.createElement("img", { className: "image-thumb", src: image.url }),
+                    _react2.default.createElement("img", { className: "image-thumb", src: image.url, onError: this.handleImageError }),
                     _react2.default.createElement(
                         "div",
                         { className: "like-wrapper" },
@@ -4355,7 +4524,6 @@ var ImageList = function (_get__$Component) {
                     })
                 );
             });
-            console.log(mappedImages);
             return _react2.default.createElement(
                 'div',
                 null,
@@ -5009,9 +5177,15 @@ var _ImageList = require('./ImageList');
 
 var _ImageList2 = _interopRequireDefault(_ImageList);
 
+var _Messages = require('../Messages');
+
+var _Messages2 = _interopRequireDefault(_Messages);
+
 var _images_actions = require('../../actions/images_actions');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -5025,23 +5199,77 @@ var Images = function (_get__$Component) {
     function Images() {
         _classCallCheck(this, Images);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(Images).apply(this, arguments));
+        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Images).call(this));
+
+        _this.state = {
+            title: "",
+            url: ""
+        };
+        return _this;
     }
 
     _createClass(Images, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            console.log(this.props.token);
             this.props.dispatch(_get__('getUserImages')(this.props.user, this.props.token));
+        }
+    }, {
+        key: 'handleChange',
+        value: function handleChange(event) {
+            this.setState(_defineProperty({}, event.target.name, event.target.value));
+        }
+    }, {
+        key: 'handleSubmit',
+        value: function handleSubmit(event) {
+            event.preventDefault();
+            this.props.dispatch(_get__('addImage')(this.props.user, this.props.token, this.state.title, this.state.url));
+            this.setState({ title: '', url: '' });
         }
     }, {
         key: 'render',
         value: function render() {
+            var _Messages_Component = _get__('Messages');
+
             var _ImageList_Component = _get__('ImageList');
 
             return _react2.default.createElement(
                 'div',
                 null,
+                _react2.default.createElement(
+                    'div',
+                    { className: 'row' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'small-12 medium-6 medium-offset-3' },
+                        _react2.default.createElement(
+                            'form',
+                            { className: 'add-image-form', onSubmit: this.handleSubmit.bind(this) },
+                            _react2.default.createElement(
+                                'h4',
+                                null,
+                                'Add a new image!'
+                            ),
+                            _react2.default.createElement(
+                                'label',
+                                { htmlFor: 'title' },
+                                'Title'
+                            ),
+                            _react2.default.createElement('input', { type: 'text', name: 'title', placeholder: 'Image title', value: this.state.title, onChange: this.handleChange.bind(this) }),
+                            _react2.default.createElement(
+                                'label',
+                                { htmlFor: 'url' },
+                                'Image link'
+                            ),
+                            _react2.default.createElement('input', { type: 'url', name: 'url', placeholder: 'http://example.com/my_image.jpg', value: this.state.url, onChange: this.handleChange.bind(this) }),
+                            _react2.default.createElement(
+                                'button',
+                                { className: 'button', type: 'submit' },
+                                'Add'
+                            )
+                        ),
+                        _react2.default.createElement(_Messages_Component, { messages: this.props.messages })
+                    )
+                ),
                 _react2.default.createElement(_ImageList_Component, { images: this.props.images, token: this.props.token })
             );
         }
@@ -5054,7 +5282,8 @@ var mapStateToProps = function mapStateToProps(state) {
     return {
         images: state.images,
         user: state.auth.user,
-        token: state.auth.token
+        token: state.auth.token,
+        messages: state.messages
     };
 };
 
@@ -5103,6 +5332,12 @@ function _get_original__(variableName) {
     switch (variableName) {
         case 'getUserImages':
             return _images_actions.getUserImages;
+
+        case 'addImage':
+            return _images_actions.addImage;
+
+        case 'Messages':
+            return _Messages2.default;
 
         case 'ImageList':
             return _ImageList2.default;
@@ -5222,7 +5457,7 @@ exports.__set__ = _set__;
 exports.__ResetDependency__ = _reset__;
 exports.__RewireAPI__ = _RewireAPI__;
 
-},{"../../actions/images_actions":3,"./ImageList":16,"react":274,"react-redux":95}],20:[function(require,module,exports){
+},{"../../actions/images_actions":3,"../Messages":20,"./ImageList":16,"react":274,"react-redux":95}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -6006,6 +6241,9 @@ Object.defineProperty(exports, "__esModule", {
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 exports.default = images;
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 var initialState = {
     isFetching: false,
     items: []
@@ -6020,6 +6258,8 @@ function images() {
             return Object.assign({}, state, { isFetching: true });
         case "RECEIVE_IMAGES_SUCCESS":
             return Object.assign({}, state, { isFetching: false, items: action.images.slice() });
+        case "ADD_IMAGE_SUCCESS":
+            return Object.assign({}, state, { items: [].concat(_toConsumableArray(state.items), [action.image]) });
         default:
             return state;
     }
@@ -6380,6 +6620,8 @@ function messages() {
     case 'OAUTH_FAILURE':
     case 'UNLINK_FAILURE':
     case 'LINK_FAILURE':
+    case 'ADD_IMAGE_FAILURE':
+    case 'RECEIVE_IMAGES_FAILURE':
       return {
         error: action.messages
       };
