@@ -11,6 +11,7 @@ import Forgot from './components/Account/Forgot';
 import Reset from './components/Account/Reset';
 import Images from './components/Images/Images';
 import MyImages from './components/Images/MyImages';
+import LikedImages from './components/Images/LikedImages';
 
 export default function getRoutes(store) {
   const ensureAuthenticated = (nextState, replace) => {
@@ -39,6 +40,7 @@ export default function getRoutes(store) {
       <Route path='/reset/:token' component={Reset} onEnter={skipIfAuthenticated} onLeave={clearMessages}/>
       <Route path="/images" component={Images} onLeave={clearMessages}/>
       <Route path="/:userId/images" component={MyImages} onEnter={ensureAuthenticated} onLeave={clearMessages} />
+      <Route path="/:userId/images/liked" component={LikedImages} onEnter={ensureAuthenticated} onLeave={clearMessages} />
       <Route path="*" component={NotFound} onLeave={clearMessages}/>
     </Route>
   );

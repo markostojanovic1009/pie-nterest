@@ -19,6 +19,7 @@ class Header extends React.Component {
       <div className="top-bar-right">
         <ul className="vertical medium-horizontal menu">
           <li><Link to={ "/" + this.props.user.id + "/images"} activeClassName="active">My images</Link></li>
+          <li><Link to={ "/" + this.props.user.id + "/images/liked"} activeClassName="active">Liked images</Link></li>
           <li><Link to="/account" activeClassName="active">My Account</Link></li>
           <li><a href="#" onClick={this.handleLogout.bind(this)}>Logout</a></li>
         </ul>
