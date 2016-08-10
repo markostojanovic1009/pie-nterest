@@ -1,18 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import ImageList from './ImageList';
-import { getAllImages } from '../../actions/images_actions';
+import { getUserImages } from '../../actions/images_actions';
 
 class Images extends React.Component {
 
     componentDidMount() {
-        this.props.dispatch(getAllImages());
+        console.log(this.props.token);
+        this.props.dispatch(getUserImages(this.props.user, this.props.token));
     }
 
     render() {
         return(
             <div>
-              <ImageList images={this.props.images} />
+                <ImageList images={this.props.images} token={this.props.token}/>
             </div>
         );
     }
@@ -21,6 +22,8 @@ class Images extends React.Component {
 const mapStateToProps = (state) => {
     return {
         images: state.images,
+        user: state.auth.user,
+        token: state.auth.token
     }
 };
 
