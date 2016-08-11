@@ -50,7 +50,7 @@ function login(email, password) {
             user: json.user
           });
           _get__('cookie').save('token', json.token, { expires: _get__('moment')().add(1, 'hour').toDate() });
-          _get__('browserHistory').push('/account');
+          _get__('browserHistory').push('/');
         });
       } else {
         return response.json().then(function (json) {
@@ -450,17 +450,21 @@ exports.getAllImages = getAllImages;
 exports.getUserImages = getUserImages;
 exports.getLikedImages = getLikedImages;
 exports.addImage = addImage;
+exports.likeImage = likeImage;
 
 var _reactRouter = require('react-router');
 
-function getAllImages() {
+function getAllImages(token) {
     return function (dispatch) {
         dispatch({
             type: "REQUEST_IMAGES"
         });
         return fetch('/api/images', {
             method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            }
         }).then(function (response) {
             return response.json().then(function (json) {
                 if (response.ok) {
@@ -565,6 +569,40 @@ function addImage(user, token, title, url) {
                 }
             });
         });
+    };
+}
+
+function likeImage(user, token, imageId) {
+    return function (dispatch) {
+        dispatch({
+            type: "CLEAR_MESSAGES"
+        });
+        if (!user.id) {
+            _get__('browserHistory').push('/login');
+        } else {
+            return fetch('/api/' + user.id + '/images/liked', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ image_id: imageId })
+            }).then(function (response) {
+                if (response.ok) {
+                    dispatch({
+                        type: "LIKE_IMAGE_SUCCESS",
+                        imageId: imageId
+                    });
+                } else {
+                    return response.json().then(function (json) {
+                        dispatch({
+                            type: 'LIKE_IMAGE_FAILURE',
+                            messages: [json]
+                        });
+                    });
+                }
+            });
+        }
     };
 }
 
@@ -4267,9 +4305,23 @@ var Image = function (_get__$Component) {
             event.target.src = "/images/no_image_found.jpg";
         }
     }, {
+        key: "onLikeButtonClick",
+        value: function onLikeButtonClick(imageId) {
+            this.props.imageInfo.onLikeClick(imageId);
+        }
+    }, {
         key: "render",
         value: function render() {
-            var image = this.props.image;
+            var _props = this.props;
+            var image = _props.image;
+            var imageInfo = _props.imageInfo;
+
+
+            var likeButton = imageInfo.type === "ALL_IMAGES" ? _react2.default.createElement(
+                "button",
+                null,
+                _react2.default.createElement("img", { className: "like-icon", onClick: this.onLikeButtonClick.bind(this, image.id), src: image.liked ? "/images/red_heart.png" : "/images/gray_heart.png" })
+            ) : null;
 
             return _react2.default.createElement(
                 "div",
@@ -4286,11 +4338,7 @@ var Image = function (_get__$Component) {
                     _react2.default.createElement(
                         "div",
                         { className: "like-wrapper" },
-                        _react2.default.createElement(
-                            "button",
-                            null,
-                            _react2.default.createElement("img", { className: "like-icon", src: "/images/gray_heart.png" })
-                        )
+                        likeButton
                     )
                 )
             );
@@ -4501,6 +4549,7 @@ var ImageList = function (_get__$Component) {
     }, {
         key: 'render',
         value: function render() {
+            var _this2 = this;
 
             var isLoading = this.props.images.isFetching ? _react2.default.createElement(
                 'div',
@@ -4520,7 +4569,7 @@ var ImageList = function (_get__$Component) {
                     imagesSubarray.map(function (image) {
                         var _Image_Component = _get__('Image');
 
-                        return _react2.default.createElement(_Image_Component, { key: image.id, image: image });
+                        return _react2.default.createElement(_Image_Component, { key: image.id, image: image, imageInfo: _this2.props.listInfo });
                     })
                 );
             });
@@ -4711,6 +4760,10 @@ var _ImageList = require('./ImageList');
 
 var _ImageList2 = _interopRequireDefault(_ImageList);
 
+var _Messages = require('../Messages');
+
+var _Messages2 = _interopRequireDefault(_Messages);
+
 var _images_actions = require('../../actions/images_actions');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -4727,23 +4780,37 @@ var Images = function (_get__$Component) {
     function Images() {
         _classCallCheck(this, Images);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(Images).apply(this, arguments));
+        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Images).call(this));
+
+        var imageComponent = _this;
+        _this.state = {
+            listInfo: {
+                type: "ALL_IMAGES",
+                onLikeClick: function onLikeClick(imageId) {
+                    imageComponent.props.dispatch(_get__('likeImage')(imageComponent.props.user, imageComponent.props.token, imageId));
+                }
+            }
+        };
+        return _this;
     }
 
     _createClass(Images, [{
         key: 'componentDidMount',
         value: function componentDidMount() {
-            this.props.dispatch(_get__('getAllImages')());
+            this.props.dispatch(_get__('getAllImages')(this.props.token));
         }
     }, {
         key: 'render',
         value: function render() {
+            var _Messages_Component = _get__('Messages');
+
             var _ImageList_Component = _get__('ImageList');
 
             return _react2.default.createElement(
                 'div',
                 null,
-                _react2.default.createElement(_ImageList_Component, { images: this.props.images })
+                _react2.default.createElement(_Messages_Component, { messages: this.props.messages }),
+                _react2.default.createElement(_ImageList_Component, { listInfo: this.state.listInfo, images: this.props.images })
             );
         }
     }]);
@@ -4753,7 +4820,10 @@ var Images = function (_get__$Component) {
 
 var mapStateToProps = function mapStateToProps(state) {
     return {
-        images: state.images
+        images: state.images,
+        user: state.auth.user,
+        token: state.auth.token,
+        messages: state.messages
     };
 };
 
@@ -4800,8 +4870,14 @@ function _get__(variableName) {
 
 function _get_original__(variableName) {
     switch (variableName) {
+        case 'likeImage':
+            return _images_actions.likeImage;
+
         case 'getAllImages':
             return _images_actions.getAllImages;
+
+        case 'Messages':
+            return _Messages2.default;
 
         case 'ImageList':
             return _ImageList2.default;
@@ -4921,7 +4997,7 @@ exports.__set__ = _set__;
 exports.__ResetDependency__ = _reset__;
 exports.__RewireAPI__ = _RewireAPI__;
 
-},{"../../actions/images_actions":3,"./ImageList":16,"react":274,"react-redux":95}],18:[function(require,module,exports){
+},{"../../actions/images_actions":3,"../Messages":20,"./ImageList":16,"react":274,"react-redux":95}],18:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4959,7 +5035,15 @@ var Images = function (_get__$Component) {
     function Images() {
         _classCallCheck(this, Images);
 
-        return _possibleConstructorReturn(this, Object.getPrototypeOf(Images).apply(this, arguments));
+        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Images).call(this));
+
+        var imageComponent = _this;
+        _this.state = {
+            listInfo: {
+                type: "LIKED_IMAGES"
+            }
+        };
+        return _this;
     }
 
     _createClass(Images, [{
@@ -4975,7 +5059,7 @@ var Images = function (_get__$Component) {
             return _react2.default.createElement(
                 'div',
                 null,
-                _react2.default.createElement(_ImageList_Component, { images: this.props.images, token: this.props.token })
+                _react2.default.createElement(_ImageList_Component, { images: this.props.images, token: this.props.token, listInfo: this.state.listInfo })
             );
         }
     }]);
@@ -5201,10 +5285,15 @@ var Images = function (_get__$Component) {
 
         var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Images).call(this));
 
+        var imageComponent = _this;
         _this.state = {
             title: "",
-            url: ""
+            url: "",
+            listInfo: {
+                type: "USER_IMAGES"
+            }
         };
+
         return _this;
     }
 
@@ -5270,7 +5359,7 @@ var Images = function (_get__$Component) {
                         _react2.default.createElement(_Messages_Component, { messages: this.props.messages })
                     )
                 ),
-                _react2.default.createElement(_ImageList_Component, { images: this.props.images, token: this.props.token })
+                _react2.default.createElement(_ImageList_Component, { images: this.props.images, token: this.props.token, listInfo: this.state.listInfo })
             );
         }
     }]);
@@ -6260,6 +6349,15 @@ function images() {
             return Object.assign({}, state, { isFetching: false, items: action.images.slice() });
         case "ADD_IMAGE_SUCCESS":
             return Object.assign({}, state, { items: [].concat(_toConsumableArray(state.items), [action.image]) });
+        case "LIKE_IMAGE_SUCCESS":
+            return Object.assign({}, state, {
+                items: state.items.map(function (image) {
+                    if (image.id === action.imageId) {
+                        return Object.assign({}, image, { liked: true });
+                    }
+                    return image;
+                })
+            });
         default:
             return state;
     }
@@ -6622,6 +6720,7 @@ function messages() {
     case 'LINK_FAILURE':
     case 'ADD_IMAGE_FAILURE':
     case 'RECEIVE_IMAGES_FAILURE':
+    case 'LIKE_IMAGE_FAILURE':
       return {
         error: action.messages
       };
@@ -10336,17 +10435,8 @@ module.exports = invariant;
 },{"_process":84}],77:[function(require,module,exports){
 var overArg = require('./_overArg');
 
-/* Built-in method references for those with the same name as other `lodash` methods. */
-var nativeGetPrototype = Object.getPrototypeOf;
-
-/**
- * Gets the `[[Prototype]]` of `value`.
- *
- * @private
- * @param {*} value The value to query.
- * @returns {null|Object} Returns the `[[Prototype]]`.
- */
-var getPrototype = overArg(nativeGetPrototype, Object);
+/** Built-in value references. */
+var getPrototype = overArg(Object.getPrototypeOf, Object);
 
 module.exports = getPrototype;
 
@@ -10374,7 +10464,7 @@ module.exports = isHostObject;
 
 },{}],79:[function(require,module,exports){
 /**
- * Creates a function that invokes `func` with its first argument transformed.
+ * Creates a unary function that invokes `func` with its argument transformed.
  *
  * @private
  * @param {Function} func The function to wrap.
@@ -10442,7 +10532,7 @@ var objectCtorString = funcToString.call(Object);
 
 /**
  * Used to resolve the
- * [`toStringTag`](http://ecma-international.org/ecma-262/6.0/#sec-object.prototype.tostring)
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
  * of values.
  */
 var objectToString = objectProto.toString;
@@ -10456,8 +10546,7 @@ var objectToString = objectProto.toString;
  * @since 0.8.0
  * @category Lang
  * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a plain object,
- *  else `false`.
+ * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
  * @example
  *
  * function Foo() {

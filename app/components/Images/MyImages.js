@@ -7,12 +7,16 @@ import { getUserImages, addImage } from '../../actions/images_actions';
 class Images extends React.Component {
     constructor() {
         super();
+        const imageComponent = this;
         this.state = {
             title: "",
-            url: ""
+            url: "",
+            listInfo: {
+                type: "USER_IMAGES"
+            }
         }
-    }
 
+    }
     componentDidMount() {
         this.props.dispatch(getUserImages(this.props.user, this.props.token));
     }
@@ -44,7 +48,7 @@ class Images extends React.Component {
                         <Messages messages={this.props.messages} />
                     </div>
                 </div>
-                <ImageList images={this.props.images} token={this.props.token}/>
+                <ImageList images={this.props.images} token={this.props.token} listInfo={this.state.listInfo}/>
 
             </div>
         );

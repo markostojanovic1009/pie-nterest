@@ -30,13 +30,23 @@ var User = bookshelf.Model.extend({
 
   likeImage(imageId) {
     const self = this;
+    let likedImage;
     return new Promise((resolve, reject) => {
       Image.forge({id: imageId}).fetch().then((image) => {
-        self.liked().attach(image);
+        likedImage = image;
+        return self.liked().fetch();
+      }).then((likedCollection) => {
+        if(likedCollection.get(likedImage)) {
+          throw {
+            msg: "You already liked this image."
+          };
+        } else {
+          return self.liked().attach(likedImage);
+        }
       }).then(() => {
         resolve();
-      }).then(() => {
-        reject({
+      }).catch((error) => {
+        reject(error || {
           msg: "An error occurred, please try again later."
         });
       });

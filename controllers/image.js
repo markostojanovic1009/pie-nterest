@@ -1,5 +1,6 @@
 import Image from '../models/Image';
 var User = require('../models/User');
+var _ = require('lodash');
 
 /**
  * Middleware that checks whether the right user is logged in.
@@ -11,6 +12,7 @@ exports.ensureAuthenticated = function(req, res, next) {
         next();
     } else {
         res.status(401).send({ msg: 'Unauthorized' });
+        next();
     }
 };
 
@@ -36,10 +38,27 @@ export function postImage(req, res) {
 }
 
 export function getAllImages(req, res) {
+    let allImages = [];
     new Image()
         .fetchAll({require: true})
-        .then(function(books) {
-            res.status(200).send(books);
+        .then((images) => {
+            allImages = images.toJSON();
+            if(!req.user) {
+                return res.status(200).send(images);
+            } else {
+                return User.forge({id: req.user.id}).getLikedImages()
+                    .then((likedImagesCollection) => {
+                        const likedImages = likedImagesCollection.toJSON();
+                        allImages = allImages.map((image) => {
+                            for(let i = 0; i < likedImages.length; i++) {
+                                if(likedImages[i].id === image.id)
+                                    return Object.assign(image, { liked: true });
+                            }
+                            return image;
+                        });
+                        res.status(200).send(allImages);
+                    })
+            }
         })
         .catch((error) => {
            res.status(404).send({msg: "No images found."});
@@ -73,12 +92,12 @@ export function likeImage(req, res) {
     new User({id: req.user.id})
         .fetch()
         .then((user) => {
-            user.likeImage(imageId);
+            return user.likeImage(imageId);
         })
         .then(() => {
             res.sendStatus(204);
         })
-        .catch((error) => {
-           res.status(400).send({msg: "No image with that id found."});
+        .catch((error) => {;
+           res.status(400).send(error);
         });
 }

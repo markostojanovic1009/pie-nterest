@@ -12,6 +12,7 @@ export default function messages(state = {}, action) {
     case 'LINK_FAILURE':
     case 'ADD_IMAGE_FAILURE':
     case 'RECEIVE_IMAGES_FAILURE':
+    case 'LIKE_IMAGE_FAILURE':
       return {
         error: action.messages
       };

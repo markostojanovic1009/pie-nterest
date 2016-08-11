@@ -5,6 +5,16 @@ import { getLikedImages } from '../../actions/images_actions';
 
 class Images extends React.Component {
 
+    constructor() {
+        super();
+        const imageComponent = this;
+        this.state = {
+            listInfo: {
+                type: "LIKED_IMAGES"
+            }
+        }
+    }
+
     componentDidMount() {
         this.props.dispatch(getLikedImages(this.props.user, this.props.token));
     }
@@ -12,7 +22,7 @@ class Images extends React.Component {
     render() {
         return(
             <div>
-                <ImageList images={this.props.images} token={this.props.token}/>
+                <ImageList images={this.props.images} token={this.props.token} listInfo={this.state.listInfo}/>
             </div>
         );
     }

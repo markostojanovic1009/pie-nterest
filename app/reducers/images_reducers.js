@@ -11,6 +11,15 @@ export default function images(state = initialState, action) {
             return Object.assign({}, state, { isFetching: false, items: action.images.slice()});
         case "ADD_IMAGE_SUCCESS":
             return Object.assign({}, state, { items: [...state.items, action.image]});
+        case "LIKE_IMAGE_SUCCESS":
+            return Object.assign({}, state, {
+                items: state.items.map((image) => {
+                    if(image.id === action.imageId) {
+                        return Object.assign({}, image, { liked: true })
+                    }
+                    return image;
+                })
+            });
         default:
             return state;
     }

@@ -27,7 +27,7 @@ class ImageList extends React.Component {
                 <div className="expanded row" key={index}>
                     {imagesSubarray.map((image) => {
                         return (
-                            <Image key={image.id} image={image}/>
+                            <Image key={image.id} image={image} imageInfo={this.props.listInfo}/>
                         );
                     })}
                 </div>
