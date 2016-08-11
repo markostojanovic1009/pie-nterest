@@ -85,10 +85,14 @@ app.get('/auth/twitter/callback', userController.authTwitterCallback);
  * I use /api/ to prevent the user from accessing it directly
  */
 app.get('/api/images', imageController.getAllImages);
+
 app.get('/api/:userId/images', imageController.ensureAuthenticated, imageController.getUserImages);
 app.post('/api/:userId/images', imageController.ensureAuthenticated, imageController.postImage);
-app.post('/api/:userId/images/liked', imageController.ensureAuthenticated, imageController.likeImage);
+app.delete('/api/:userId/images', imageController.ensureAuthenticated, imageController.deleteImage);
+
 app.get('/api/:userId/images/liked', imageController.ensureAuthenticated, imageController.getLikedImages);
+app.post('/api/:userId/images/liked', imageController.ensureAuthenticated, imageController.likeImage);
+
 
 // React server rendering
 app.use(function(req, res) {

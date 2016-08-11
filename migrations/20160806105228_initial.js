@@ -1,7 +1,7 @@
 exports.up = function(knex, Promise) {
     return Promise.all([
         knex.schema.createTable('users', (users) => {
-            users.increments();
+            users.increments().onDelete('CASCADE');
             users.string('name');
             users.string('email').unique();
             users.string('password');
@@ -17,7 +17,7 @@ exports.up = function(knex, Promise) {
             users.string('vk');
             users.timestamps();
         }).createTable('images', (images) => {
-            images.increments();
+            images.increments().onDelete('CASCADE');
             images.string("url").notNullable();
             images.string("title");
             images.integer("user_id").references("id").inTable('users');

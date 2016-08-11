@@ -97,7 +97,16 @@ export function likeImage(req, res) {
         .then(() => {
             res.sendStatus(204);
         })
-        .catch((error) => {;
+        .catch((error) => {
            res.status(400).send(error);
         });
+}
+
+export function deleteImage(req, res) {
+    Image.forge({id: req.body.image_id}).destroy().then(() => {
+        res.sendStatus(204);
+    }).catch((error) => {
+        console.log(error);
+        res.status(400).send({msg: "An error occured while deleting the image. Please try again later."});
+    })
 }

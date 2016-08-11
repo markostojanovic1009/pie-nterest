@@ -13,6 +13,9 @@ class Images extends React.Component {
             url: "",
             listInfo: {
                 type: "USER_IMAGES"
+            },
+            onDeleteClick(imageId) {
+                imageComponent.props.dispatch(deleteImage(imageComponent.props.user, imageComponent.props.token, imageId));
             }
         }
 

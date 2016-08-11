@@ -17,9 +17,9 @@ class ImageList extends React.Component {
     render() {
 
         const isLoading = this.props.images.isFetching ? (
-            <div>
-                <p>Loading... {this.props.token}</p>
-            </div>
+                <div className="loader">
+                    Loading...
+                </div>
         ) : null;
 
         let mappedImages = this.splitArray(this.props.images.items, 6).map((imagesSubarray, index) => {

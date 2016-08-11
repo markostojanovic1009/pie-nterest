@@ -14,9 +14,16 @@
 
 .like-wrapper {
   text-align: center;
+  button:focus {
+    outline: none;
+  }
+
 }
 
 .like-icon {
   margin-top: 10px;
   width: 30px;
+  &:focus {
+    outline: none;
+  }
 }

@@ -123,7 +123,7 @@ export function likeImage(user, token, imageId) {
         dispatch({
             type: "CLEAR_MESSAGES"
         });
-        if(!user.id) {
+        if(!user) {
             browserHistory.push('/login');
         } else {
             return fetch('/api/' + user.id + '/images/liked', {
@@ -143,6 +143,40 @@ export function likeImage(user, token, imageId) {
                     return response.json().then((json) => {
                         dispatch({
                             type: 'LIKE_IMAGE_FAILURE',
+                            messages: [json]
+                        });
+                    });
+                }
+            })
+        }
+    }
+}
+
+export function deleteImage(user, token, imageId) {
+    return (dispatch) => {
+        dispatch({
+            type: "CLEAR_MESSAGES"
+        });
+        if(!user) {
+            browserHistory.push('/login');
+        } else {
+            return fetch('/api/' + user.id + '/images', {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({image_id: imageId})
+            }).then((response) => {
+                if (response.ok) {
+                    dispatch({
+                        type: "DELETE_IMAGE_SUCCESS",
+                        imageId
+                    });
+                } else {
+                    return response.json().then((json) => {
+                        dispatch({
+                            type: 'DELETE_IMAGE_FAILURE',
                             messages: [json]
                         });
                     });

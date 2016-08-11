@@ -2,6 +2,7 @@
 @import "vendor/foundation/foundation";
 @import "all_images.scss";
 @import "my_images.scss";
+@import "__loader.scss";
 
 @include foundation-global-styles;
 @include foundation-grid;

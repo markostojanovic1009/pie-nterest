@@ -451,6 +451,7 @@ exports.getUserImages = getUserImages;
 exports.getLikedImages = getLikedImages;
 exports.addImage = addImage;
 exports.likeImage = likeImage;
+exports.deleteImage = deleteImage;
 
 var _reactRouter = require('react-router');
 
@@ -577,7 +578,7 @@ function likeImage(user, token, imageId) {
         dispatch({
             type: "CLEAR_MESSAGES"
         });
-        if (!user.id) {
+        if (!user) {
             _get__('browserHistory').push('/login');
         } else {
             return fetch('/api/' + user.id + '/images/liked', {
@@ -597,6 +598,40 @@ function likeImage(user, token, imageId) {
                     return response.json().then(function (json) {
                         dispatch({
                             type: 'LIKE_IMAGE_FAILURE',
+                            messages: [json]
+                        });
+                    });
+                }
+            });
+        }
+    };
+}
+
+function deleteImage(user, token, imageId) {
+    return function (dispatch) {
+        dispatch({
+            type: "CLEAR_MESSAGES"
+        });
+        if (!user) {
+            _get__('browserHistory').push('/login');
+        } else {
+            return fetch('/api/' + user.id + '/images', {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + token
+                },
+                body: JSON.stringify({ image_id: imageId })
+            }).then(function (response) {
+                if (response.ok) {
+                    dispatch({
+                        type: "DELETE_IMAGE_SUCCESS",
+                        imageId: imageId
+                    });
+                } else {
+                    return response.json().then(function (json) {
+                        dispatch({
+                            type: 'DELETE_IMAGE_FAILURE',
                             messages: [json]
                         });
                     });
@@ -4553,13 +4588,8 @@ var ImageList = function (_get__$Component) {
 
             var isLoading = this.props.images.isFetching ? _react2.default.createElement(
                 'div',
-                null,
-                _react2.default.createElement(
-                    'p',
-                    null,
-                    'Loading... ',
-                    this.props.token
-                )
+                { className: 'loader' },
+                'Loading...'
             ) : null;
 
             var mappedImages = this.splitArray(this.props.images.items, 6).map(function (imagesSubarray, index) {
@@ -5291,6 +5321,9 @@ var Images = function (_get__$Component) {
             url: "",
             listInfo: {
                 type: "USER_IMAGES"
+            },
+            onDeleteClick: function onDeleteClick(imageId) {
+                imageComponent.props.dispatch(deleteImage(imageComponent.props.user, imageComponent.props.token, imageId));
             }
         };
 
