@@ -26,7 +26,8 @@ class Images extends React.Component {
         return(
             <div>
               <Messages messages={this.props.messages} />
-              <ImageList listInfo={this.state.listInfo} images={this.props.images} />
+              <ImageList listInfo={this.state.listInfo} images={this.props.images} userId={this.props.user ?
+                  this.props.user.id : null}/>
             </div>
         );
     }

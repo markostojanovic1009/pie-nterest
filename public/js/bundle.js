@@ -3826,8 +3826,6 @@ var Header = function (_get__$Component) {
 
       var _Link_Component6 = _get__('Link');
 
-      var _Link_Component7 = _get__('Link');
-
       return _react2.default.createElement(
         'div',
         { className: 'top-bar' },
@@ -3868,15 +3866,6 @@ var Header = function (_get__$Component) {
                 null,
                 _react2.default.createElement(
                   _Link_Component6,
-                  { to: '/contact', activeClassName: 'active' },
-                  'Contact'
-                )
-              ),
-              _react2.default.createElement(
-                'li',
-                null,
-                _react2.default.createElement(
-                  _Link_Component7,
                   { to: '/images', activeClassName: 'active' },
                   'Images'
                 )
@@ -4345,17 +4334,35 @@ var Image = function (_get__$Component) {
             this.props.imageInfo.onLikeClick(imageId);
         }
     }, {
+        key: "onDeleteButtonClick",
+        value: function onDeleteButtonClick(imageId) {
+            this.props.imageInfo.onDeleteClick(imageId);
+        }
+    }, {
         key: "render",
         value: function render() {
             var _props = this.props;
             var image = _props.image;
             var imageInfo = _props.imageInfo;
+            var userId = _props.userId;
 
 
-            var likeButton = imageInfo.type === "ALL_IMAGES" ? _react2.default.createElement(
+            var likeButton = imageInfo.type === "ALL_IMAGES" && image.user_id !== userId ? _react2.default.createElement(
                 "button",
                 null,
                 _react2.default.createElement("img", { className: "like-icon", onClick: this.onLikeButtonClick.bind(this, image.id), src: image.liked ? "/images/red_heart.png" : "/images/gray_heart.png" })
+            ) : null;
+
+            var usersImage = image.user_id === userId ? _react2.default.createElement(
+                "div",
+                { className: "image-owner" },
+                "Your image"
+            ) : null;
+
+            var deleteButton = imageInfo.type === "USER_IMAGES" ? _react2.default.createElement(
+                "button",
+                null,
+                _react2.default.createElement("img", { className: "delete-icon", onClick: this.onDeleteButtonClick.bind(this, image.id), src: "/images/delete_button.png" })
             ) : null;
 
             return _react2.default.createElement(
@@ -4373,7 +4380,9 @@ var Image = function (_get__$Component) {
                     _react2.default.createElement(
                         "div",
                         { className: "like-wrapper" },
-                        likeButton
+                        likeButton,
+                        usersImage,
+                        deleteButton
                     )
                 )
             );
@@ -4592,21 +4601,54 @@ var ImageList = function (_get__$Component) {
                 'Loading...'
             ) : null;
 
+            var listTitle = void 0;
+            switch (this.props.listInfo.type) {
+                case "ALL_IMAGES":
+                    listTitle = "All Images";
+                    break;
+                case "USER_IMAGES":
+                    listTitle = "My images";
+                    break;
+                case "LIKED_IMAGES":
+                    listTitle = "Images you liked";
+            }
+
             var mappedImages = this.splitArray(this.props.images.items, 6).map(function (imagesSubarray, index) {
                 return _react2.default.createElement(
                     'div',
-                    { className: 'expanded row', key: index },
-                    imagesSubarray.map(function (image) {
-                        var _Image_Component = _get__('Image');
+                    null,
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'expanded row', key: index },
+                        imagesSubarray.map(function (image) {
+                            var _Image_Component = _get__('Image');
 
-                        return _react2.default.createElement(_Image_Component, { key: image.id, image: image, imageInfo: _this2.props.listInfo });
-                    })
+                            return _react2.default.createElement(_Image_Component, { key: image.id, image: image, imageInfo: _this2.props.listInfo, userId: _this2.props.userId });
+                        })
+                    )
                 );
             });
             return _react2.default.createElement(
                 'div',
                 null,
                 isLoading,
+                _react2.default.createElement(
+                    'div',
+                    { className: 'row' },
+                    _react2.default.createElement(
+                        'div',
+                        { className: 'small-12 medium-4 medium-offset-4' },
+                        _react2.default.createElement(
+                            'div',
+                            { className: 'image-list-title' },
+                            _react2.default.createElement(
+                                'h2',
+                                null,
+                                listTitle
+                            )
+                        )
+                    )
+                ),
                 mappedImages
             );
         }
@@ -4840,7 +4882,7 @@ var Images = function (_get__$Component) {
                 'div',
                 null,
                 _react2.default.createElement(_Messages_Component, { messages: this.props.messages }),
-                _react2.default.createElement(_ImageList_Component, { listInfo: this.state.listInfo, images: this.props.images })
+                _react2.default.createElement(_ImageList_Component, { listInfo: this.state.listInfo, images: this.props.images, userId: this.props.user ? this.props.user.id : null })
             );
         }
     }]);
@@ -5320,10 +5362,10 @@ var Images = function (_get__$Component) {
             title: "",
             url: "",
             listInfo: {
-                type: "USER_IMAGES"
-            },
-            onDeleteClick: function onDeleteClick(imageId) {
-                imageComponent.props.dispatch(deleteImage(imageComponent.props.user, imageComponent.props.token, imageId));
+                type: "USER_IMAGES",
+                onDeleteClick: function onDeleteClick(imageId) {
+                    imageComponent.props.dispatch(_get__('deleteImage')(imageComponent.props.user, imageComponent.props.token, imageId));
+                }
             }
         };
 
@@ -5452,6 +5494,9 @@ function _get__(variableName) {
 
 function _get_original__(variableName) {
     switch (variableName) {
+        case 'deleteImage':
+            return _images_actions.deleteImage;
+
         case 'getUserImages':
             return _images_actions.getUserImages;
 
@@ -6391,6 +6436,12 @@ function images() {
                     return image;
                 })
             });
+        case "DELETE_IMAGE_SUCCESS":
+            return Object.assign({}, state, {
+                items: state.items.filter(function (image) {
+                    return image.id !== action.imageId;
+                })
+            });
         default:
             return state;
     }
@@ -6884,22 +6935,19 @@ function getRoutes(store) {
 
   var _Route_Component10 = _get__('Route');
 
-  var _Route_Component11 = _get__('Route');
-
   return _react2.default.createElement(
     _Route_Component,
     { path: '/', component: _get__('App') },
     _react2.default.createElement(_IndexRoute_Component, { component: _get__('Home'), onLeave: clearMessages }),
-    _react2.default.createElement(_Route_Component2, { path: '/contact', component: _get__('Contact'), onLeave: clearMessages }),
-    _react2.default.createElement(_Route_Component3, { path: '/login', component: _get__('Login'), onEnter: skipIfAuthenticated, onLeave: clearMessages }),
-    _react2.default.createElement(_Route_Component4, { path: '/signup', component: _get__('Signup'), onEnter: skipIfAuthenticated, onLeave: clearMessages }),
-    _react2.default.createElement(_Route_Component5, { path: '/account', component: _get__('Profile'), onEnter: ensureAuthenticated, onLeave: clearMessages }),
-    _react2.default.createElement(_Route_Component6, { path: '/forgot', component: _get__('Forgot'), onEnter: skipIfAuthenticated, onLeave: clearMessages }),
-    _react2.default.createElement(_Route_Component7, { path: '/reset/:token', component: _get__('Reset'), onEnter: skipIfAuthenticated, onLeave: clearMessages }),
-    _react2.default.createElement(_Route_Component8, { path: '/images', component: _get__('Images'), onLeave: clearMessages }),
-    _react2.default.createElement(_Route_Component9, { path: '/:userId/images', component: _get__('MyImages'), onEnter: ensureAuthenticated, onLeave: clearMessages }),
-    _react2.default.createElement(_Route_Component10, { path: '/:userId/images/liked', component: _get__('LikedImages'), onEnter: ensureAuthenticated, onLeave: clearMessages }),
-    _react2.default.createElement(_Route_Component11, { path: '*', component: _get__('NotFound'), onLeave: clearMessages })
+    _react2.default.createElement(_Route_Component2, { path: '/login', component: _get__('Login'), onEnter: skipIfAuthenticated, onLeave: clearMessages }),
+    _react2.default.createElement(_Route_Component3, { path: '/signup', component: _get__('Signup'), onEnter: skipIfAuthenticated, onLeave: clearMessages }),
+    _react2.default.createElement(_Route_Component4, { path: '/account', component: _get__('Profile'), onEnter: ensureAuthenticated, onLeave: clearMessages }),
+    _react2.default.createElement(_Route_Component5, { path: '/forgot', component: _get__('Forgot'), onEnter: skipIfAuthenticated, onLeave: clearMessages }),
+    _react2.default.createElement(_Route_Component6, { path: '/reset/:token', component: _get__('Reset'), onEnter: skipIfAuthenticated, onLeave: clearMessages }),
+    _react2.default.createElement(_Route_Component7, { path: '/images', component: _get__('Images'), onLeave: clearMessages }),
+    _react2.default.createElement(_Route_Component8, { path: '/:userId/images', component: _get__('MyImages'), onEnter: ensureAuthenticated, onLeave: clearMessages }),
+    _react2.default.createElement(_Route_Component9, { path: '/:userId/images/liked', component: _get__('LikedImages'), onEnter: ensureAuthenticated, onLeave: clearMessages }),
+    _react2.default.createElement(_Route_Component10, { path: '*', component: _get__('NotFound'), onLeave: clearMessages })
   );
 }
 
@@ -6953,9 +7001,6 @@ function _get_original__(variableName) {
 
     case 'Home':
       return _Home2.default;
-
-    case 'Contact':
-      return _Contact2.default;
 
     case 'Login':
       return _Login2.default;

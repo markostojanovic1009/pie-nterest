@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import ImageList from './ImageList';
 import Messages from '../Messages';
-import { getUserImages, addImage } from '../../actions/images_actions';
+import { getUserImages, addImage, deleteImage } from '../../actions/images_actions';
 
 class Images extends React.Component {
     constructor() {
@@ -12,10 +12,10 @@ class Images extends React.Component {
             title: "",
             url: "",
             listInfo: {
-                type: "USER_IMAGES"
-            },
-            onDeleteClick(imageId) {
-                imageComponent.props.dispatch(deleteImage(imageComponent.props.user, imageComponent.props.token, imageId));
+                type: "USER_IMAGES",
+                onDeleteClick(imageId) {
+                    imageComponent.props.dispatch(deleteImage(imageComponent.props.user, imageComponent.props.token, imageId));
+                }
             }
         }
 

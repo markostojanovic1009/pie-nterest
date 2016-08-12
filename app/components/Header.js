@@ -44,7 +44,6 @@ class Header extends React.Component {
           <div className="top-bar-left">
             <ul className="vertical medium-horizontal menu">
               <li><IndexLink to="/" activeClassName="active">Home</IndexLink></li>
-              <li><Link to="/contact" activeClassName="active">Contact</Link></li>
               <li><Link to="/images" activeClassName="active">Images</Link></li>
             </ul>
           </div>

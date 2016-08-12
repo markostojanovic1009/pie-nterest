@@ -20,6 +20,12 @@ export default function images(state = initialState, action) {
                     return image;
                 })
             });
+        case "DELETE_IMAGE_SUCCESS":
+            return Object.assign({}, state, {
+                items: state.items.filter((image) => {
+                    return image.id !== action.imageId;
+                })
+            });
         default:
             return state;
     }

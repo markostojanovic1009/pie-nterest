@@ -10,12 +10,26 @@ class Image extends React.Component {
         this.props.imageInfo.onLikeClick(imageId);
     }
 
-    render() {
-        const { image, imageInfo } = this.props ;
+    onDeleteButtonClick(imageId) {
+        this.props.imageInfo.onDeleteClick(imageId);
+    }
 
-        const likeButton = imageInfo.type === "ALL_IMAGES" ?
+    render() {
+        const { image, imageInfo, userId } = this.props ;
+
+        const likeButton = (imageInfo.type === "ALL_IMAGES" && image.user_id !== userId) ?
             <button>
                 <img className="like-icon" onClick={this.onLikeButtonClick.bind(this, image.id)} src={image.liked ? "/images/red_heart.png" : "/images/gray_heart.png" }/>
+            </button> : null;
+
+        const usersImage = (image.user_id === userId) ?
+            <div className="image-owner">
+                Your image
+            </div> : null;
+
+        const deleteButton = imageInfo.type === "USER_IMAGES" ?
+            <button>
+                <img className="delete-icon" onClick={this.onDeleteButtonClick.bind(this, image.id)} src="/images/delete_button.png" />
             </button> : null;
 
         return (
@@ -25,6 +39,8 @@ class Image extends React.Component {
                     <img className="image-thumb" src={image.url} onError={this.handleImageError} />
                     <div className="like-wrapper">
                         {likeButton}
+                        {usersImage}
+                        {deleteButton}
                     </div>
                 </div>
             </div>

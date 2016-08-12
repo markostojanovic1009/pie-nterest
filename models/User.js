@@ -34,7 +34,15 @@ var User = bookshelf.Model.extend({
     return new Promise((resolve, reject) => {
       Image.forge({id: imageId}).fetch().then((image) => {
         likedImage = image;
-        return self.liked().fetch();
+        return self.images().fetch();
+      }).then((userImages) => {
+        if(userImages.get(likedImage)) {
+          throw {
+            msg: "You cannot like your own images."
+          }
+        } else {
+          return self.liked().fetch();
+        }
       }).then((likedCollection) => {
         if(likedCollection.get(likedImage)) {
           throw {

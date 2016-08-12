@@ -20,9 +20,7 @@ exports.seed = function(knex, Promise) {
                 url: 'https://www.nasa.gov/sites/default/files/thumbnails/image/hs-2015-29-a-xlarge_web.jpg'});
         }).then(() => {
             return knex('images').insert({user_id: parseInt(firstUserId), title: 'Beautiful nebula',
-                url: 'https://i.ytimg.com/vi/S05yDA-_bF4/maxresdefault.jpg'}).returning("id");
-        }).then((secondImageId) => {
-            return knex('liked_images').insert({user_id: parseInt(firstUserId), image_id: parseInt(secondImageId)});
+                url: 'https://i.ytimg.com/vi/S05yDA-_bF4/maxresdefault.jpg'});
         }).then(() => {
             var imageArray = [];
             for(let i = 1; i < 10; i++)
