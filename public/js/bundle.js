@@ -803,7 +803,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Sign in with Twitter
 function twitterLogin() {
   var twitter = {
-    url: 'http://localhost:3000/auth/twitter',
+    url: 'http://localhost:3000/auth/twitter/',
     redirectUri: 'http://localhost:3000/auth/twitter/callback',
     authorizationUrl: 'https://api.twitter.com/oauth/authenticate'
   };
@@ -3840,7 +3840,7 @@ var Header = function (_get__$Component) {
           _react2.default.createElement(
             _IndexLink_Component,
             { to: '/' },
-            'Pinterest Clone'
+            'Pie-nterest'
           )
         ),
         _react2.default.createElement(
@@ -4112,7 +4112,7 @@ var Home = function (_get__$Component) {
             _react2.default.createElement(
               'h1',
               { className: 'intro-text' },
-              'Welcome to PinterestClone! Like Pinterest. Only worse!'
+              'Welcome to Pie-nterest. Like Pinterest, but with more Pies.'
             )
           )
         )

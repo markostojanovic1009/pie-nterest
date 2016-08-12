@@ -10,7 +10,7 @@ class Home extends React.Component {
         <div className="row">
           <div className="small-12 columns">
             <h1 className="intro-text">
-              Welcome to PinterestClone! Like Pinterest. Only worse!
+              Welcome to Pie-nterest. Like Pinterest, but with more Pies.
             </h1>
           </div>
         </div>
